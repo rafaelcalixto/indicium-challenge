@@ -1,8 +1,6 @@
-from csv import reader
-from unicodedata import normalize
 from datetime import date
-from matplotlib import pyplot
-from utils import get_dictdata, normalize_string, count_sales
+from io_utils import get_dictdata, report, plot_graphs
+from logic_utils import greatest_scores, normalize_string, count_sales
 
 deals = get_dictdata("deals")
 contacts = get_dictdata("contacts")
@@ -11,22 +9,26 @@ sectors = get_dictdata("sectors")
 
 employee_sales = {}
 month_sales = {}
+sector_sales = {}
 
 for key in deals.keys():
-    if deals[key][3] in contacts.keys():
-        employee = normalize_string(contacts[deals[key][3]][0])
+    if deals[key][2] in contacts.keys():
+        employee = normalize_string(contacts[deals[key][2]][0])
         count_sales(employee, int(deals[key][1]), employee_sales)
 
     month, day, year = deals[key][0].split("/")
     period = date(int(year), int(month), int(day)).strftime("%B") + "/" + year
     count_sales(period, int(deals[key][1]), month_sales)
 
-plot_graphs( tuple(employee_sales.keys())
-           , tuple(employee_sales.values())
-           , "Employee Sales"
-           , "Employee Sales Graph")
+    if deals[key][3] in contacts.keys():
+        sector = sectors[companies[deals[key][3]][-1]][0]
+        count_sales(sector, int(deals[key][1]), sector_sales)
 
-plot_graphs( tuple(month_sales.keys())
-           , tuple(month_sales.values())
-           , "Month Sales"
-           , "Month Sales Graph")
+k_employees, v_employees = greatest_scores(employee_sales, 10)
+k_month, v_month = greatest_scores(month_sales, 10)
+sectors, sales = greatest_scores(sector_sales, len(sector_sales))
+
+plot_graphs(k_employees, v_employees, "Employee Sales", "Employee Sales Graph")
+plot_graphs(k_month, v_month, "Month Sales", "Month Sales Graph")
+
+report(sectors, sales)

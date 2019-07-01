@@ -1,3 +1,6 @@
+from csv import reader, writer
+from matplotlib import pyplot
+
 def get_dictdata(file_name):
     ### variables ###
     file_name : str  # the name of the tsv file without the extention
@@ -7,25 +10,8 @@ def get_dictdata(file_name):
     temp_dict = {}
     with open("data/" + file_name + ".tsv") as file:
         for row in tuple(reader(file, delimiter = "\t"))[1:]:
-            temp_dict[row[0]] = row[1:]
+            temp_dict[str(row[0]).replace('"','')] = row[1:]
     return temp_dict
-
-def normalize_string(name):
-    ### variables ###
-    file_name : str  # the name of the employee
-    ### return ###
-    temp_dict : dict # the name normalized
-    return normalize("NFKD", name).encode("ASCII", "ignore").decode("utf-8")
-
-def count_sales(key, sales, dict_data):
-    ### variables ###
-    key       : str  # the name of the employee or the date as month/year
-    sales     : int  # the value of the sales
-    dict_data : dict  # a pointer to the dict
-    ### return ###
-    None # This function needs no return because uses the pointer of the dict
-    if key not in dict_data.keys(): dict_data[key] = 0
-    dict_data[key] += sales
 
 def plot_graphs(x, y, label, title):
     ### variables ###
@@ -35,9 +21,22 @@ def plot_graphs(x, y, label, title):
     title : str   # title for the graph
     ### return ###
     None
-    pyplot.plot(x, y, label = label)
+    pyplot.bar(x, y, label = label)
     pyplot.title(title)
-    pyplot.xticks(x, x, rotation = "vertical")
+    pyplot.xticks(x, x, rotation = 40)
     pyplot.legend( loc="upper center", bbox_to_anchor = (0.5, -0.1)
                  , fancybox = True, ncol = 2)
+    fig = pyplot.gcf()
+    fig.set_size_inches(15, 8.5)
     pyplot.savefig( title + ".png" )
+    pyplot.clf()
+    pyplot.cla()
+    pyplot.close()
+
+def report(sectors, sales):
+    with open("sector report.csv", "w", newline = "\n") as file:
+        csv_writer = writer(file, delimiter = ";", )
+        print("Report:\nThose are the sectors of the company ranked by the sales")
+        for ind, sec in enumerate(sectors):
+            csv_writer.writerow((str(int(ind) + 1), sec, sales[ind]))
+            print(str(int(ind) + 1), sec, sales[ind])
