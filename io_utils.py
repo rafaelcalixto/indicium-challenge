@@ -34,6 +34,11 @@ def plot_graphs(x, y, label, title):
     pyplot.close()
 
 def report(sectors, sales):
+    ### variables ###
+    sectors : tuple # List of sector ordened by sales volume
+    sales   : tuple # List of sales in a descendent order
+    ### return ###
+    None
     with open("sector report.csv", "w", newline = "\n") as file:
         csv_writer = writer(file, delimiter = ";", )
         print("Report:\nThose are the sectors of the company ranked by the sales")
